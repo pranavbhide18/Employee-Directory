@@ -1,7 +1,7 @@
 package com.myspringapp.employeedemo.filter;
 
-import com.myspringapp.employeedemo.service.EmployeeDetailsServiceImpl;
-import com.myspringapp.employeedemo.service.JwtService;
+import com.myspringapp.employeedemo.service.authentication.EmployeeDetailsServiceImpl;
+import com.myspringapp.employeedemo.service.authentication.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

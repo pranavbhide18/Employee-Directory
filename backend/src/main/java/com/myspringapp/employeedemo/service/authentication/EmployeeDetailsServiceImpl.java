@@ -1,4 +1,4 @@
-package com.myspringapp.employeedemo.service;
+package com.myspringapp.employeedemo.service.authentication;
 
 import com.myspringapp.employeedemo.dao.EmployeeRepository;
 import org.springframework.security.core.userdetails.UserDetails;

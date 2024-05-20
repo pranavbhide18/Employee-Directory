@@ -1,7 +1,7 @@
 package com.myspringapp.employeedemo.config;
 
 import com.myspringapp.employeedemo.filter.JwtAuthenticationFilter;
-import com.myspringapp.employeedemo.service.EmployeeDetailsServiceImpl;
+import com.myspringapp.employeedemo.service.authentication.EmployeeDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

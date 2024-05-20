@@ -3,6 +3,7 @@ package com.myspringapp.employeedemo.controller;
 import com.myspringapp.employeedemo.entity.Employee;
 import com.myspringapp.employeedemo.entity.Project;
 import com.myspringapp.employeedemo.entity.Role;
+import com.myspringapp.employeedemo.service.email.EmailService;
 import com.myspringapp.employeedemo.service.employee.EmployeeService;
 import com.myspringapp.employeedemo.service.project.ProjectService;
 import org.hibernate.Hibernate;
@@ -19,11 +20,13 @@ public class EmployeeController {
 
     private EmployeeService employeeService;
     private ProjectService projectService;
+    private EmailService emailService;
     private final PasswordEncoder passwordEncoder;
 
-    public EmployeeController(EmployeeService employeeService, ProjectService projectService, PasswordEncoder passwordEncoder) {
+    public EmployeeController(EmployeeService employeeService, ProjectService projectService, EmailService emailService, PasswordEncoder passwordEncoder) {
         this.employeeService = employeeService;
         this.projectService = projectService;
+        this.emailService = emailService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -46,10 +49,14 @@ public class EmployeeController {
     // Create an employee
     @PostMapping("/admin/employees")
     public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) {
-
+        String rawPassword = employee.getPassword();
         employee.setRole(Role.ROLE_EMPLOYEE);
-        employee.setPassword(passwordEncoder.encode(employee.getPassword()));
+        employee.setPassword(passwordEncoder.encode(rawPassword));
         Employee newEmployee = employeeService.save(employee);
+
+        String emailMessage = String.format("Hello %s %s,\n\nUse the credentials below to login to the system.\nUsername: %s\nPassword: %s\n\nRegards,\nYour Company",
+                employee.getFirstName(), employee.getLastName(), employee.getUsername(), rawPassword);
+        emailService.sendEmail(employee.getEmail(), "Company Account Credentials", emailMessage);
 
         return ResponseEntity.ok(newEmployee);
     }

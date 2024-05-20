@@ -1,17 +1,14 @@
-package com.myspringapp.employeedemo.service;
+package com.myspringapp.employeedemo.service.authentication;
 
 import com.myspringapp.employeedemo.dao.EmployeeRepository;
 import com.myspringapp.employeedemo.entity.AuthenticationResponse;
 import com.myspringapp.employeedemo.entity.Employee;
 import com.myspringapp.employeedemo.entity.Role;
 import com.myspringapp.employeedemo.entity.UserDTO;
-import com.myspringapp.employeedemo.service.JwtService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class AuthenticationService {

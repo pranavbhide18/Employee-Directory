@@ -1,4 +1,4 @@
-package com.myspringapp.employeedemo.service;
+package com.myspringapp.employeedemo.service.authentication;
 
 import com.myspringapp.employeedemo.entity.Employee;
 import io.jsonwebtoken.Claims;
@@ -15,7 +15,7 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private final String SECRET_KEY = "0676af03cc10c46947f425a7a4f1d9669a7aedb62ed74a274b0ee0bd20fc08a6";
+    private final String SECRET_KEY = "add your secret";
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);

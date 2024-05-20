@@ -9,7 +9,7 @@ public class UserDTO {
     private String token;
     private Integer projectId;
 
-    public UserDTO(Integer id, String username, Role role, String token, Integer projectId) {
+    public UserDTO(Integer id, String username, Role role,Integer projectId, String token ) {
         this.id = id;
         this.username = username;
         this.role = role;

@@ -2,7 +2,7 @@ package com.myspringapp.employeedemo.controller;
 
 import com.myspringapp.employeedemo.entity.Employee;
 import com.myspringapp.employeedemo.entity.UserDTO;
-import com.myspringapp.employeedemo.service.AuthenticationService;
+import com.myspringapp.employeedemo.service.authentication.AuthenticationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
