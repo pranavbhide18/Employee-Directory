@@ -102,6 +102,23 @@ function CreateEmployee() {
 
                     <div className="mb-4">
                         <label
+                            htmlFor="email"
+                            className="block mb-2 text-sm font-medium text-gray-900"
+                        >
+                            Email
+                        </label>
+                        <input
+                            type="text"
+                            id="email"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 transition duration-200 ease-in-out transform hover:scale-105 focus:scale-105"
+                            placeholder="Enter email"
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+
+                    <div className="mb-4">
+                        <label
                             htmlFor="password"
                             className="block mb-2 text-sm font-medium text-gray-900"
                         >

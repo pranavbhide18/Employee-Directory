@@ -7,6 +7,8 @@ function Employees() {
     const [employee, setEmployee] = useState([]);
     const { currentEmployee } = useSelector((state) => state.employee);
 
+    const isAdmin = currentEmployee.role == "ROLE_ADMIN";
+
     // contains function to fetch all the employees
     useEffect(() => {
         const fetchEmployees = async () => {
@@ -77,9 +79,11 @@ function Employees() {
                                 <th scope="col" className="px-6 py-3">
                                     Role
                                 </th>
-                                <th scope="col" className="px-6 py-3">
-                                    Admin Controls
-                                </th>
+                                {isAdmin && (
+                                    <th scope="col" className="px-6 py-3">
+                                        Admin Controls
+                                    </th>
+                                )}
                             </tr>
                         </thead>
                         <tbody>
@@ -106,16 +110,18 @@ function Employees() {
                                             <td className="px-6 py-4">
                                                 {emp.role}
                                             </td>
-                                            <td className="px-6 py-4">
-                                                <button
-                                                    className="text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-bold rounded-lg text-sm px-5 py-2.5 transition duration-200 ease-in-out transform hover:scale-105 focus:scale-105"
-                                                    onClick={() =>
-                                                        handleDelete(emp.id)
-                                                    }
-                                                >
-                                                    Delete
-                                                </button>
-                                            </td>
+                                            {isAdmin && (
+                                                <td className="px-6 py-4">
+                                                    <button
+                                                        className="text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-bold rounded-lg text-sm px-5 py-2.5 transition duration-200 ease-in-out transform hover:scale-105 focus:scale-105"
+                                                        onClick={() =>
+                                                            handleDelete(emp.id)
+                                                        }
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </td>
+                                            )}
                                         </tr>
                                     )}
                                 </React.Fragment>

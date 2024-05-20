@@ -85,7 +85,7 @@ function UpdateProfile() {
                     <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
                         Update Profile
                     </h1>
-                    <div className="mb-4">
+                    <div className="mb-4 ">
                         <label
                             htmlFor="firstName"
                             className="block text-sm font-medium text-gray-800 mb-2"
@@ -98,7 +98,7 @@ function UpdateProfile() {
                             placeholder="Enter First Name"
                             value={formData.firstName}
                             readOnly
-                            className="w-full rounded-lg  bg-gray-100 border border-gray-300  text-sm text-gray-800 "
+                            className="w-full rounded-lg bg-gray-100 border border-gray-300  text-sm text-gray-800 "
                         />
                     </div>
                     <div className="mb-4">

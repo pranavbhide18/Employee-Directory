@@ -7,12 +7,14 @@ public class UserDTO {
     private String username;
     private Role role;
     private String token;
+    private Integer projectId;
 
-    public UserDTO(Integer id, String username, Role role, String token) {
+    public UserDTO(Integer id, String username, Role role, String token, Integer projectId) {
         this.id = id;
         this.username = username;
         this.role = role;
         this.token = token;
+        this.projectId = projectId;
     }
 
     public Integer getId() {
@@ -45,5 +47,13 @@ public class UserDTO {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public Integer getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Integer projectId) {
+        this.projectId = projectId;
     }
 }

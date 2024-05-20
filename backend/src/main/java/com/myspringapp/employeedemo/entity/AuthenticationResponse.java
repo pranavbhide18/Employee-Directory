@@ -10,7 +10,7 @@ public class AuthenticationResponse {
     public AuthenticationResponse(String token, Employee employee) {
         this.token = token;
         this.employee = employee;
-        this.userDTO = new UserDTO(employee.getId(), employee.getUsername(), employee.getRole(), this.token);
+        this.userDTO = new UserDTO(employee.getId(), employee.getUsername(), employee.getRole(), employee.getProjectId(), this.token);
     }
 
     public String getToken() {

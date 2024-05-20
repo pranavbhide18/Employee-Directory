@@ -23,7 +23,6 @@ import EmployeeRoutes from "./components/EmployeeRoutes.jsx";
 import Employee from "./pages/Employee.jsx";
 import UpdateProfile from "./pages/UpdateProfile.jsx";
 import CreateProject from "./pages/CreateProject.jsx";
-import Profile1 from "./pages/final/Profile1.jsx";
 
 const router = createBrowserRouter(
     createRoutesFromElements(

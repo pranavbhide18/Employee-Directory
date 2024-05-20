@@ -1,16 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import {
-    Button,
-    ButtonGroup,
-    Select,
-    Table,
-    Label,
-    TextInput,
-    Textarea,
-    Progress,
-} from "flowbite-react";
+import { Button, Select, Table } from "flowbite-react";
+import { RiDeleteBin6Line } from "react-icons/ri";
 import { useSelector } from "react-redux";
 
 function Project() {
@@ -25,6 +17,11 @@ function Project() {
     const { currentEmployee } = useSelector((state) => state.employee);
     const { projectId } = useParams();
     const navigate = useNavigate();
+
+    const isAdminOrProjectManager =
+        currentEmployee.role == "ROLE_ADMIN" ||
+        (project.projectManager &&
+            project.projectManager.id == currentEmployee.id);
 
     useEffect(() => {
         const fetchProject = async () => {
@@ -47,7 +44,6 @@ function Project() {
         };
 
         const fetchEmployees = async () => {
-            ``;
             const token = localStorage.getItem("token");
 
             if (token) {
@@ -262,287 +258,314 @@ function Project() {
     };
 
     return (
-        <>
-            <div className="flex justify-evenly w-full my-5 mx-10 gap-x-4">
-                {/* General Project Details */}
-                <div className="flex-1">
-                    <h1>Project Details</h1>
-                    <h2>Project Id : {project.id}</h2>
-                    <h2 className="text-xl">
-                        Project Name: {project.projectName}
-                    </h2>
-                    <h2>Project Description: {project.description}</h2>
-                    <h2>Project Type: {project.projectType}</h2>
-                    <h2>
-                        Project Status:{" "}
-                        {project.completed ? "Completed" : "Not Complete"}
-                    </h2>
-                    <h2>
-                        Project Creation:{" "}
-                        {new Date(project.createdAt).toDateString()}
-                    </h2>
-                    Project Manager :
-                    {project.projectManager ? (
-                        <span> {project.projectManager.firstName}</span>
-                    ) : (
-                        "Not Assigned"
-                    )}
-                    <div className="my-3">
-                        Project Team :
-                        {project.projectTeam &&
-                            project.projectTeam.map((emp) => (
-                                <React.Fragment key={emp.id}>
-                                    <h3
-                                        className={
-                                            emp.role == "ROLE_MANAGER"
-                                                ? "font-bold text-green-600 underline"
-                                                : ""
-                                        }
-                                    >
-                                        {emp.id} | {emp.firstName}{" "}
-                                        {emp.lastName}
-                                    </h3>
-                                </React.Fragment>
-                            ))}
-                    </div>
-                    <div>
-                        Project Tasks:
-                        <Table>
-                            <Table.Body>
-                                {project.tasks &&
-                                    project.tasks.map((task) => (
-                                        <Table.Row
-                                            key={task.id}
-                                            className={`text-black ${
-                                                task.completed
-                                                    ? "bg-green-500"
-                                                    : "bg-red-500"
-                                            } `}
-                                        >
-                                            <Table.Cell>
-                                                {task.taskName}
-                                            </Table.Cell>
-                                            <Table.Cell className="truncate">
-                                                {task.description}
-                                            </Table.Cell>
-
-                                            <Table.Cell>
-                                                {(currentEmployee.role ==
-                                                    "ROLE_ADMIN" ||
-                                                    currentEmployee.id ==
-                                                        project.projectManager
-                                                            .id) && (
-                                                    <Button.Group>
-                                                        <Button
-                                                            disabled={
-                                                                task.completed
-                                                            }
-                                                            outline
-                                                            onClick={() =>
-                                                                checkComplete(
-                                                                    task.id
-                                                                )
-                                                            }
-                                                        >
-                                                            &#10003;
-                                                        </Button>
-                                                        <Button
-                                                            outline
-                                                            onClick={() =>
-                                                                deleteTask(
-                                                                    task.id
-                                                                )
-                                                            }
-                                                        >
-                                                            X
-                                                        </Button>
-                                                    </Button.Group>
-                                                )}
-                                            </Table.Cell>
-                                        </Table.Row>
-                                    ))}
-                            </Table.Body>
-                        </Table>
-                    </div>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-blue-200 to-pink-300 space-y-8 px-16">
+            {/* First section */}
+            <div className="flex space-x-8 text-center w-full">
+                <div className="  bg-white p-4 rounded-md shadow-lg flex-grow max-w-11">
+                    <p>{project.id}</p>
                 </div>
-                <div className="flex-1">
-                    {/* Select Menu to assign Manager */}
-                    {currentEmployee.role == "ROLE_ADMIN" && (
-                        <div className="mt-4">
-                            <div>
-                                <form
-                                    className="max-w-sm"
-                                    onSubmit={handleManagerChange}
-                                >
-                                    <label
-                                        htmlFor="manager"
-                                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                                    >
-                                        {project.projectManager ? (
-                                            <h2>Assign New Manager</h2>
-                                        ) : (
-                                            <h2>Assign Project Manager</h2>
-                                        )}
-                                    </label>
-                                    <Select
-                                        id="manager"
-                                        value={manager}
-                                        onChange={handleChange}
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                    >
-                                        <option value="">
-                                            Assign a manager
-                                        </option>
-                                        {employee.map(
-                                            (emp) =>
-                                                emp.role != "ROLE_ADMIN" &&
-                                                (project.projectManager ==
-                                                    null ||
-                                                    emp.id !=
-                                                        project.projectManager
-                                                            .id) && (
-                                                    <option
-                                                        className={
-                                                            emp.role ==
-                                                            "ROLE_MANAGER"
-                                                                ? "text-red-600"
-                                                                : "text-blue-600"
-                                                        }
-                                                        key={emp.id}
-                                                        value={emp.id}
-                                                    >
-                                                        {emp.id} |{" "}
-                                                        {emp.firstName}{" "}
-                                                        {emp.lastName}{" "}
-                                                        {emp.role ==
-                                                        "ROLE_MANAGER"
-                                                            ? `| (Project ${emp.projectId} | Manager) `
-                                                            : emp.projectId
-                                                            ? `| (Project ${emp.projectId})`
-                                                            : ""}
-                                                    </option>
-                                                )
-                                        )}
-                                    </Select>
-                                    <Button type="submit">
-                                        Assign Manager
-                                    </Button>
-                                </form>
+                <div className="border-l-2 border-gray-400"></div>
+                <div className="min-w-[600px] bg-white p-4 rounded-md shadow-lg">
+                    <p>{project.projectName}</p>
+                </div>
+                <div className="border-l-2 border-gray-400"></div>
+                <div className="min-w-64 bg-white p-4 rounded-md shadow-lg">
+                    <p>{project.projectType}</p>
+                </div>
+                <div className="border-l-2 border-gray-400"></div>
+                <div className="min-w-44 bg-white p-4 rounded-md shadow-lg">
+                    <p>{project.completed ? "Completed" : "Not Complete"}</p>
+                </div>
+                <div className="border-l-2 border-gray-400"></div>
+                <div className="min-w-44 bg-white p-4 rounded-md shadow-lg">
+                    <p>{new Date(project.createdAt).toDateString()}</p>
+                </div>
+            </div>
+
+            {/* *************** */}
+            <div className="flex space-x-8 w-full ">
+                {/* Second section */}
+                <div className="flex flex-col space-y-4 w-full">
+                    <div className="min-h-44 bg-white p-4 rounded-md shadow-lg transform transition-transform duration-300 hover:scale-105">
+                        <h2>Description:</h2>
+                        <p>{project.description}</p>
+                    </div>
+                    <div className="min-h-72 max-h-72  bg-white p-4 rounded-md shadow-lg transform transition-transform duration-300 hover:scale-105 overflow-y-scroll">
+                        <div>
+                            <h2>Project Tasks:</h2>
+                            <Table>
+                                <Table.Body>
+                                    {project.tasks &&
+                                        project.tasks.map((task) => (
+                                            <Table.Row
+                                                key={task.id}
+                                                className={`text-black ${
+                                                    task.completed
+                                                        ? "bg-green-500"
+                                                        : "bg-red-500"
+                                                }`}
+                                            >
+                                                <Table.Cell>
+                                                    {task.taskName}
+                                                </Table.Cell>
+                                                <Table.Cell className="truncate">
+                                                    {task.description}
+                                                </Table.Cell>
+                                                {isAdminOrProjectManager && (
+                                                    <Table.Cell>
+                                                        <Button.Group>
+                                                            <Button
+                                                                disabled={
+                                                                    task.completed
+                                                                }
+                                                                outline
+                                                                onClick={() =>
+                                                                    checkComplete(
+                                                                        task.id
+                                                                    )
+                                                                }
+                                                            >
+                                                                &#10003;
+                                                            </Button>
+                                                            <Button
+                                                                onClick={() =>
+                                                                    deleteTask(
+                                                                        task.id
+                                                                    )
+                                                                }
+                                                                outline
+                                                            >
+                                                                <RiDeleteBin6Line />
+                                                            </Button>
+                                                        </Button.Group>
+                                                    </Table.Cell>
+                                                )}
+                                            </Table.Row>
+                                        ))}
+                                </Table.Body>
+                            </Table>
+                        </div>
+                    </div>
+                    <div className="flex space-x-4">
+                        <div className="min-h-72 max-h-72 bg-white p-4 rounded-md shadow-lg transform transition-transform duration-300 hover:scale-105 w-full overflow-y-scroll">
+                            <div className="my-3">
+                                <h2>Project Team:</h2>
+                                {project.projectTeam &&
+                                    project.projectTeam.map((emp) => (
+                                        <h3
+                                            key={emp.id}
+                                            className={
+                                                emp.role === "ROLE_MANAGER"
+                                                    ? "font-bold text-green-600 underline"
+                                                    : ""
+                                            }
+                                        >
+                                            {emp.id} | {emp.firstName}{" "}
+                                            {emp.lastName}
+                                        </h3>
+                                    ))}
                             </div>
                         </div>
-                    )}
-
-                    {/* Select Menu to add members */}
-                    {currentEmployee.role == "ROLE_ADMIN" && (
-                        <div className="mt-4">
-                            <div>
+                        {currentEmployee.role == "ROLE_ADMIN" && (
+                            <div className="bg-white p-6 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 w-full">
                                 <form
-                                    className="max-w-sm"
                                     onSubmit={addTeamMembers}
+                                    className="max-w-sm space-y-4"
                                 >
                                     <label
                                         htmlFor="team"
-                                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                                        className="block mb-2 text-sm font-medium text-gray-900"
                                     >
-                                        {project.projectTeam ? (
-                                            <h2>Add More Team Members</h2>
-                                        ) : (
-                                            <h2>Add Team Members</h2>
-                                        )}
+                                        <h2>
+                                            {project.projectTeam
+                                                ? "Add More Team Members"
+                                                : "Add Team Members"}
+                                        </h2>
                                     </label>
                                     <Select
                                         multiple
                                         id="team"
                                         value={team}
                                         onChange={handleTeamChange}
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                     >
                                         <option value="">+ members</option>
-                                        {employee.map(
-                                            (emp) =>
-                                                emp.role == "ROLE_EMPLOYEE" &&
-                                                emp.projectId != projectId && (
-                                                    <option
-                                                        key={emp.id}
-                                                        value={emp.id}
-                                                        className={
-                                                            emp.projectId
-                                                                ? "text-red-600"
-                                                                : "text-blue-700"
-                                                        }
-                                                    >
-                                                        {emp.id} |{" "}
-                                                        {emp.firstName}{" "}
-                                                        {emp.lastName}{" "}
-                                                        {emp.projectId
-                                                            ? `| (Project ${emp.projectId})`
-                                                            : ""}
-                                                    </option>
-                                                )
-                                        )}
+                                        {employee
+                                            .filter(
+                                                (emp) =>
+                                                    emp.role ===
+                                                        "ROLE_EMPLOYEE" &&
+                                                    emp.projectId !== projectId
+                                            )
+                                            .map((emp) => (
+                                                <option
+                                                    key={emp.id}
+                                                    value={emp.id}
+                                                    className={
+                                                        emp.projectId
+                                                            ? "text-red-600"
+                                                            : "text-blue-700"
+                                                    }
+                                                >
+                                                    {emp.id} | {emp.firstName}{" "}
+                                                    {emp.lastName}{" "}
+                                                    {emp.projectId
+                                                        ? `| (Project ${emp.projectId})`
+                                                        : ""}
+                                                </option>
+                                            ))}
                                     </Select>
-                                    <Button type="submit">Add Members</Button>
+                                    <Button
+                                        type="submit"
+                                        className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
+                                    >
+                                        Add Members
+                                    </Button>
                                 </form>
                             </div>
+                        )}
+                    </div>
+                </div>
+                {/* Third section */}
+                <div className="flex flex-col space-y-4 w-full">
+                    <div className=" bg-white p-4 rounded-md shadow-lg transform transition-transform duration-300 hover:scale-105 ">
+                        {project.projectManager ? (
+                            <p>
+                                {" "}
+                                {project.projectManager.firstName}{" "}
+                                {project.projectManager.lastName}
+                            </p>
+                        ) : (
+                            "Manager not Assigned"
+                        )}
+                    </div>
+                    {currentEmployee.role == "ROLE_ADMIN" && (
+                        <div className=" bg-white p-4 rounded-md shadow-lg transform transition-transform duration-300 hover:scale-105 ">
+                            {
+                                <div className="mt-4">
+                                    <form
+                                        className="max-w-sm"
+                                        onSubmit={handleManagerChange}
+                                    >
+                                        <label
+                                            htmlFor="manager"
+                                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                                        >
+                                            <h2>
+                                                {project.projectManager
+                                                    ? "Assign New Manager"
+                                                    : "Assign Project Manager"}
+                                            </h2>
+                                        </label>
+                                        <select
+                                            id="manager"
+                                            value={manager}
+                                            onChange={handleChange}
+                                            className="bg-gray-50 border border-gray-400 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        >
+                                            <option value="">
+                                                Assign a manager
+                                            </option>
+                                            {employee.map((emp) => (
+                                                <option
+                                                    key={emp.id}
+                                                    value={emp.id}
+                                                    className={
+                                                        emp.role ===
+                                                        "ROLE_MANAGER"
+                                                            ? "text-red-600"
+                                                            : "text-blue-600"
+                                                    }
+                                                >
+                                                    {`${emp.id} | ${
+                                                        emp.firstName
+                                                    } ${emp.lastName} ${
+                                                        emp.role ===
+                                                        "ROLE_MANAGER"
+                                                            ? `(Project ${emp.projectId} | Manager)`
+                                                            : emp.projectId
+                                                            ? `(Project ${emp.projectId})`
+                                                            : ""
+                                                    }`}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <button
+                                            type="submit"
+                                            className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-300"
+                                        >
+                                            Assign Manager
+                                        </button>
+                                    </form>
+                                </div>
+                            }
                         </div>
                     )}
-
-                    {/* Form for manager to add new task */}
-                    {(currentEmployee.role == "ROLE_ADMIN" ||
-                        (project.projectManager &&
-                            project.projectManager.id ==
-                                currentEmployee.id)) && (
-                        <form onSubmit={addTask} className=" max-w-md">
-                            <div>
-                                <div className="mb-2 block">
-                                    <Label
+                    {isAdminOrProjectManager && (
+                        <div className=" bg-white p-4 rounded-md shadow-lg transform transition-transform duration-300 hover:scale-105">
+                            <form onSubmit={addTask} className="space-y-6">
+                                <div>
+                                    <label
                                         htmlFor="taskName"
-                                        value="Task Name"
-                                    />
+                                        className="block text-gray-700 font-medium mb-2"
+                                    >
+                                        Task Name
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            id="taskName"
+                                            type="text"
+                                            placeholder="Enter task name"
+                                            value={newTask.taskName}
+                                            onChange={handleTaskChange}
+                                            required
+                                            className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    </div>
                                 </div>
-                                <TextInput
-                                    id="taskName"
-                                    type="text"
-                                    placeholder="Task Name"
-                                    value={newTask.taskName}
-                                    onChange={handleTaskChange}
-                                    required
-                                    shadow
-                                />
-                            </div>
-                            <div>
-                                <div className="mb-2 block">
-                                    <Label
+                                <div>
+                                    <label
                                         htmlFor="description"
-                                        value="Description"
+                                        className="block text-gray-700 font-medium mb-2"
+                                    >
+                                        Description
+                                    </label>
+                                    <textarea
+                                        id="description"
+                                        placeholder="Enter description..."
+                                        value={newTask.description}
+                                        onChange={handleTaskChange}
+                                        required
+                                        rows={4}
+                                        className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     />
                                 </div>
-                                <Textarea
-                                    id="description"
-                                    placeholder="Enter description..."
-                                    value={newTask.description}
-                                    onChange={handleTaskChange}
-                                    required
-                                    rows={2}
-                                />
-                            </div>
-                            <Button type="submit">Add Task</Button>
-                        </form>
+                                <button
+                                    type="submit"
+                                    className="w-full bg-blue-500 text-white py-2 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-300"
+                                >
+                                    Add Task
+                                </button>
+                            </form>
+                        </div>
                     )}
+                    {currentEmployee.role == "ROLE_ADMIN" && (
+                        <div className="bg-white p-6 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 ">
+                            <h2 className="text-md font-semibold text-gray-800 pb-2 ">
+                                Project Control
+                            </h2>
 
-                    <div>
-                        {currentEmployee.role == "ROLE_ADMIN" && (
                             <Button
-                                className="my-5"
+                                className="w-full bg-pink-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors"
                                 onClick={() => handleDelete(project.id)}
                             >
                                 Delete Project
                             </Button>
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
             </div>
-        </>
+        </div>
     );
 }
 

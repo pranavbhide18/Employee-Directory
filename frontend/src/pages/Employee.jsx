@@ -10,39 +10,48 @@ function Profile() {
     const { currentEmployee } = useSelector((state) => state.employee);
     const { empId } = useParams();
     const navigate = useNavigate();
+    const isAdmin = currentEmployee.role == "ROLE_ADMIN";
+    const isEmployee = currentEmployee.id == employee.id;
 
     useEffect(() => {
         const token = localStorage.getItem("token");
-        const fetchEmployee = async () => {
-            if (token) {
-                try {
-                    const res = await axios.get(`/api/employees/${empId}`, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    });
-                    console.log(res.data);
-                    setEmployee(res.data);
-                    if (res.data.projectId) {
-                        const projectRes = await axios.get(
-                            `/api/projects/${res.data.projectId}`,
-                            {
-                                headers: {
-                                    Authorization: `Bearer ${token}`,
-                                },
-                            }
+        if (currentEmployee.id == empId) {
+            navigate("/profile");
+        } else {
+            const fetchEmployee = async () => {
+                if (token) {
+                    try {
+                        const res = await axios.get(`/api/employees/${empId}`, {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
+                        });
+                        console.log(res.data);
+                        setEmployee(res.data);
+                        if (res.data.projectId) {
+                            const projectRes = await axios.get(
+                                `/api/projects/${res.data.projectId}`,
+                                {
+                                    headers: {
+                                        Authorization: `Bearer ${token}`,
+                                    },
+                                }
+                            );
+                            console.log(projectRes.data);
+                            setProject(projectRes.data);
+                        }
+                    } catch (error) {
+                        console.log(
+                            "Error fetching this employees data",
+                            error
                         );
-                        console.log(projectRes.data);
-                        setProject(projectRes.data);
                     }
-                } catch (error) {
-                    console.log("Error fetching this employees data", error);
+                } else {
+                    console.log("Token not found...");
                 }
-            } else {
-                console.log("Token not found...");
-            }
-        };
-        fetchEmployee();
+            };
+            fetchEmployee();
+        }
     }, []);
 
     // function to delete a user from directory
@@ -127,20 +136,24 @@ function Profile() {
                         </>
                     )}
                     <div className="mt-8 flex justify-between items-center">
-                        <button
-                            className="text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-bold rounded-lg text-sm px-5 py-2.5 transition duration-200 ease-in-out transform hover:scale-105 focus:scale-105"
-                            onClick={() => handleDelete(employee.id)}
-                        >
-                            Delete Employee
-                        </button>
-                        <button
-                            className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-bold rounded-lg text-sm px-5 py-2.5 transition duration-200 ease-in-out transform hover:scale-105 focus:scale-105"
-                            onClick={() =>
-                                navigate(`/employee/${employee.id}/update`)
-                            }
-                        >
-                            Update Profile
-                        </button>
+                        {isAdmin && (
+                            <button
+                                className="text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-bold rounded-lg text-sm px-5 py-2.5 transition duration-200 ease-in-out transform hover:scale-105 focus:scale-105"
+                                onClick={() => handleDelete(employee.id)}
+                            >
+                                Delete Employee
+                            </button>
+                        )}
+                        {isEmployee && (
+                            <button
+                                className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-bold rounded-lg text-sm px-5 py-2.5 transition duration-200 ease-in-out transform hover:scale-105 focus:scale-105"
+                                onClick={() =>
+                                    navigate(`/employee/${employee.id}/update`)
+                                }
+                            >
+                                Update Profile
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>

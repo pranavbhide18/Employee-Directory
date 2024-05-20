@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 function Projects() {
     const [projects, setProjects] = useState([]);
     const { currentEmployee } = useSelector((state) => state.employee);
+    const isAdmin = currentEmployee.role == "ROLE_ADMIN";
 
     useEffect(() => {
         const fetchProjects = async () => {
@@ -71,9 +72,11 @@ function Projects() {
                                 <th scope="col" className="px-6 py-3">
                                     Project Manager
                                 </th>
-                                <th scope="col" className="px-6 py-3">
-                                    Admin Controls
-                                </th>
+                                {isAdmin && (
+                                    <th scope="col" className="px-6 py-3">
+                                        Admin Controls
+                                    </th>
+                                )}
                             </tr>
                         </thead>
                         <tbody>
@@ -101,16 +104,18 @@ function Projects() {
                                             ? project.projectManager.username
                                             : "Not Assigned"}
                                     </td>
-                                    <td className="px-6 py-4">
-                                        <button
-                                            onClick={() =>
-                                                handleDelete(project.id)
-                                            }
-                                            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-200"
-                                        >
-                                            Delete
-                                        </button>
-                                    </td>
+                                    {isAdmin && (
+                                        <td className="px-6 py-4">
+                                            <button
+                                                onClick={() =>
+                                                    handleDelete(project.id)
+                                                }
+                                                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-200"
+                                            >
+                                                Delete
+                                            </button>
+                                        </td>
+                                    )}
                                 </tr>
                             ))}
                         </tbody>
