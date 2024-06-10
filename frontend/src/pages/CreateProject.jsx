@@ -47,13 +47,13 @@ function CreateProject() {
                     <form onSubmit={handleSubmit}>
                         <div className="mb-4">
                             <label
-                                htmlFor="projectName"
+                                htmlFor="name"
                                 className="block mb-2 text-sm font-medium text-gray-900"
                             >
                                 Project Name
                             </label>
                             <input
-                                id="projectName"
+                                id="name"
                                 type="text"
                                 placeholder="Project Name"
                                 onChange={handleChange}
@@ -64,13 +64,13 @@ function CreateProject() {
 
                         <div className="mb-4">
                             <label
-                                htmlFor="projectType"
+                                htmlFor="type"
                                 className="block mb-2 text-sm font-medium text-gray-900"
                             >
                                 Project Type
                             </label>
                             <input
-                                id="projectType"
+                                id="type"
                                 type="text"
                                 placeholder="Project Type"
                                 onChange={handleChange}

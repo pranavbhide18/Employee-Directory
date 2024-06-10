@@ -1,6 +1,8 @@
 package com.myspringapp.employeedemo.service.employee;
 
 import com.myspringapp.employeedemo.entity.Employee;
+import com.myspringapp.employeedemo.dto.EmployeeDTO;
+import com.myspringapp.employeedemo.dto.RegisterRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -8,17 +10,16 @@ import java.util.List;
 @Service
 public interface EmployeeService {
 
-    Employee findById(Integer id);
+    public EmployeeDTO findEmployeeById(Integer employeeId);
 
-    List<Employee> findAll();
+    public List<EmployeeDTO> findAllEmployees();
 
-    List<Employee> findAllById(List<Integer> employeeIds);
+    public EmployeeDTO createEmployee(RegisterRequest request);
 
-    Employee save(Employee employee);
+    public List<Employee> addEmployeeList(List<RegisterRequest> employees);
 
-    List<Employee> saveAll(List<Employee> employees);
+    public EmployeeDTO updateEmployee(Employee employee);
 
-    Employee remove(Integer id);
-
+    public EmployeeDTO deleteEmployee(int employeeId);
 
 }

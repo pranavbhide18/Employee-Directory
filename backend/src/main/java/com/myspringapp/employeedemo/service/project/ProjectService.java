@@ -1,18 +1,24 @@
 package com.myspringapp.employeedemo.service.project;
 
-import com.myspringapp.employeedemo.entity.Project;
+import com.myspringapp.employeedemo.dto.ProjectRequest;
+import com.myspringapp.employeedemo.dto.ProjectDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 @Service
 public interface ProjectService {
 
-    Project findById(Integer id);
+    ProjectDTO getProject(Integer id);
 
-    List<Project> findAll();
+    List<ProjectDTO> findAllProjects();
 
-    Project save(Project project);
+    ProjectDTO createProject(ProjectRequest project);
 
-    Project remove(Integer id);
+    public ProjectDTO updateProject(int id, ProjectRequest request);
 
+    ProjectDTO deleteProject(int id);
+
+    ProjectDTO addProjectTeam(int id, List<Integer> employeeIds);
+
+    ProjectDTO setProjectManager(int id, int employeeId);
 }

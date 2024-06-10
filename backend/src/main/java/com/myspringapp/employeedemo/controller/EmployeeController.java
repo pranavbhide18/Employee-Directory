@@ -1,115 +1,77 @@
 package com.myspringapp.employeedemo.controller;
 
 import com.myspringapp.employeedemo.entity.Employee;
-import com.myspringapp.employeedemo.entity.Project;
-import com.myspringapp.employeedemo.entity.Role;
+import com.myspringapp.employeedemo.dto.EmployeeDTO;
+import com.myspringapp.employeedemo.dto.RegisterRequest;
 import com.myspringapp.employeedemo.service.email.EmailService;
 import com.myspringapp.employeedemo.service.employee.EmployeeService;
 import com.myspringapp.employeedemo.service.project.ProjectService;
-import org.hibernate.Hibernate;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api")
 public class EmployeeController {
 
-    private EmployeeService employeeService;
-    private ProjectService projectService;
-    private EmailService emailService;
+    private final EmployeeService employeeService;
+    private final ProjectService projectService;
+    private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
-
-    public EmployeeController(EmployeeService employeeService, ProjectService projectService, EmailService emailService, PasswordEncoder passwordEncoder) {
-        this.employeeService = employeeService;
-        this.projectService = projectService;
-        this.emailService = emailService;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     // Fetch all the employees
     @GetMapping("/employees")
-    public ResponseEntity<List<Employee>> findAllEmployees() {
-        List<Employee> list = employeeService.findAll();
-
-        return ResponseEntity.ok(list);
+    public ResponseEntity<List<EmployeeDTO>> findAllEmployees() {
+        return ResponseEntity.ok(employeeService.findAllEmployees());
     }
 
     // Fetch single employee using employee id
-    @GetMapping("/employees/{employeeId}")
-    public ResponseEntity<Employee> findEmployeeById(@PathVariable Integer employeeId) {
-        Employee employee = employeeService.findById(employeeId);
-
-        return ResponseEntity.ok(employee);
+    @GetMapping("/employees/{id}")
+    public ResponseEntity<EmployeeDTO> findEmployeeById(@PathVariable Integer id) {
+        return ResponseEntity.ok(employeeService.findEmployeeById(id));
     }
 
     // Create an employee
     @PostMapping("/admin/employees")
-    public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) {
-        String rawPassword = employee.getPassword();
-        employee.setRole(Role.ROLE_EMPLOYEE);
-        employee.setPassword(passwordEncoder.encode(rawPassword));
-        Employee newEmployee = employeeService.save(employee);
+    public ResponseEntity<EmployeeDTO> createEmployee(@RequestBody RegisterRequest request) {
 
-        String emailMessage = String.format("Hello %s %s,\n\nUse the credentials below to login to the system.\nUsername: %s\nPassword: %s\n\nRegards,\nYour Company",
-                employee.getFirstName(), employee.getLastName(), employee.getUsername(), rawPassword);
-        emailService.sendEmail(employee.getEmail(), "Company Account Credentials", emailMessage);
+        return ResponseEntity.ok(employeeService.createEmployee(request));
+    }
 
-        return ResponseEntity.ok(newEmployee);
+
+    private EmployeeDTO employeeResponse(Employee employee) {
+
+        return new EmployeeDTO(
+                employee.getId(),
+                employee.getFirstName(),
+                employee.getLastName(),
+                employee.getUsername(),
+                employee.getEmail(),
+                employee.getRole(),
+                employee.getProjectId()
+        );
     }
 
     // Create multiple employees
     @PostMapping("/admin/employees/all")
-    public ResponseEntity<List<Employee>> addEmployeeList(@RequestBody List<Employee> employees) {
-        List<Employee> newEmployees = employees.stream()
-                .peek(emp -> {
-                    emp.setRole(Role.ROLE_EMPLOYEE);
-                    emp.setPassword(passwordEncoder.encode(emp.getPassword()));
-                })
-                .collect(Collectors.toList());
-
-        newEmployees = employeeService.saveAll(newEmployees);
-
-        return ResponseEntity.ok(newEmployees);
+    public ResponseEntity<List<Employee>> addEmployeeList(@RequestBody List<RegisterRequest> employees) {
+        return ResponseEntity.ok(employeeService.addEmployeeList(employees));
     }
 
 
     // Update an employee
     @PutMapping("/employees")
-    public ResponseEntity<Employee> updateEmployee(@RequestBody Employee employee) {
-        Employee existing = employeeService.findById(employee.getId());
-
-        if(existing == null) return ResponseEntity.notFound().build();
-
-        if(employee.getFirstName() != null) existing.setFirstName(employee.getFirstName());
-        if(employee.getLastName() != null) existing.setLastName(employee.getLastName());
-        if(employee.getPassword() != null) existing.setPassword(passwordEncoder.encode(employee.getPassword()));
-        if(employee.getUsername() != null) existing.setUsername(employee.getUsername());
-
-        employeeService.save(existing);
-        return ResponseEntity.ok(existing);
+    public ResponseEntity<EmployeeDTO> updateEmployee(@RequestBody Employee employee) {
+        return ResponseEntity.ok(employeeService.updateEmployee(employee));
     }
 
     // Delete an employee
-    @DeleteMapping("/admin/employees/{employeeId}")
-    public ResponseEntity<Employee> deleteEmployee(@PathVariable int employeeId) {
-        Employee employee = employeeService.findById(employeeId);
-        Project project = null;
-        if(employee.getProjectId() != null) {
-            project = projectService.findById(employee.getProjectId());
-            employee.setProject(null);
-            if(employee.getRole() == Role.ROLE_MANAGER) {
-                project.setProjectManager(null);
-            }
-            projectService.save(project);
-        }
-
-
-        employeeService.remove(employeeId);
-
-        return ResponseEntity.ok(employee);
+    @DeleteMapping("/admin/employees/{id}")
+    public ResponseEntity<EmployeeDTO> deleteEmployee(@PathVariable int id) {
+        return ResponseEntity.ok(employeeService.deleteEmployee(id));
     }
 }

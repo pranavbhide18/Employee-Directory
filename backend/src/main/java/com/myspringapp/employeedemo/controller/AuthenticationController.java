@@ -1,7 +1,8 @@
 package com.myspringapp.employeedemo.controller;
 
-import com.myspringapp.employeedemo.entity.Employee;
-import com.myspringapp.employeedemo.entity.UserDTO;
+import com.myspringapp.employeedemo.dto.UserDTO;
+import com.myspringapp.employeedemo.dto.LoginRequest;
+import com.myspringapp.employeedemo.dto.RegisterRequest;
 import com.myspringapp.employeedemo.service.authentication.AuthenticationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,12 +21,12 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> register(@RequestBody Employee request) {
+    public ResponseEntity<UserDTO> register(@RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authService.register(request));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserDTO> login(@RequestBody Employee request) {
+    public ResponseEntity<UserDTO> login(@RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.authenticate(request));
     }
 }

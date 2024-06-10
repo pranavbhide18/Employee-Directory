@@ -1,58 +1,129 @@
 package com.myspringapp.employeedemo.service.employee;
 
 import com.myspringapp.employeedemo.dao.EmployeeRepository;
+import com.myspringapp.employeedemo.dao.ProjectRepository;
 import com.myspringapp.employeedemo.entity.Employee;
+import com.myspringapp.employeedemo.entity.Project;
+import com.myspringapp.employeedemo.entity.Role;
+import com.myspringapp.employeedemo.dto.EmployeeDTO;
+import com.myspringapp.employeedemo.dto.RegisterRequest;
+import com.myspringapp.employeedemo.service.email.EmailService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
 
-    private EmployeeRepository employeeRepository;
+    private final EmployeeRepository employeeRepository;
+    private final ProjectRepository projectRepository;
+    private final EmailService emailService;
+    private final PasswordEncoder passwordEncoder;
 
-    public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
-        this.employeeRepository = employeeRepository;
-    }
+private EmployeeDTO employeeResponse(Employee employee) {
+
+    return new EmployeeDTO(
+            employee.getId(),
+            employee.getFirstName(),
+            employee.getLastName(),
+            employee.getUsername(),
+            employee.getEmail(),
+            employee.getRole(),
+            employee.getProjectId()
+    );
+}
 
     @Override
-    public Employee findById(Integer id){
+    public EmployeeDTO findEmployeeById(Integer id) {
         Employee employee = employeeRepository.findById(id).orElseThrow(() -> new RuntimeException("Employee not found"));
 
-        return employee;
+        return employeeResponse(employee);
     }
-
     @Override
-    public List<Employee> findAll() {
-        return employeeRepository.findAll();
-    }
-
-    @Override
-    public List<Employee> findAllById(List<Integer> employeeIds) {
-        return employeeRepository.findAllById(employeeIds);
+    public List<EmployeeDTO> findAllEmployees() {
+        return employeeRepository.findAll().stream()
+                .map(this::employeeResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public Employee save(Employee employee) {
-        return employeeRepository.save(employee);
+    public EmployeeDTO createEmployee(RegisterRequest request) {
+        String rawPassword = request.password();
+
+        Employee newEmployee = Employee.builder()
+                .firstName(request.firstName())
+                .lastName(request.lastName())
+                .username(request.username())
+                .email(request.email())
+                .password(passwordEncoder.encode(rawPassword))
+                .role(Role.ROLE_EMPLOYEE)
+                .build();
+
+        employeeRepository.save(newEmployee);
+
+        String emailMessage = String.format("Hello %s %s,\n\nUse the credentials below to login to the system.\nUsername: %s\nPassword: %s\n\nRegards,\nYour Company",
+                newEmployee.getFirstName(), newEmployee.getLastName(), newEmployee.getUsername(), rawPassword);
+        emailService.sendEmail(newEmployee.getEmail(), "Company Account Credentials", emailMessage);
+
+        return employeeResponse(newEmployee);
     }
 
     @Override
     @Transactional
-    public List<Employee> saveAll(List<Employee> employees) {
-        return employeeRepository.saveAll(employees);
+    public List<Employee> addEmployeeList(List<RegisterRequest> employees) {
+        List<Employee> newEmployees = employees.stream()
+                .map(emp ->
+                        Employee.builder()
+                                .firstName(emp.firstName())
+                                .lastName(emp.lastName())
+                                .username(emp.username())
+                                .email(emp.email())
+                                .password(passwordEncoder.encode(emp.password()))
+                                .role(Role.ROLE_EMPLOYEE)
+                                .build())
+                .toList();
+
+        employeeRepository.saveAll(newEmployees);
+
+        return newEmployees;
     }
 
     @Override
     @Transactional
-    public Employee remove(Integer id) {
-        Employee employee = employeeRepository.findById(id).orElseThrow(() -> new RuntimeException("Employee not found"));
+    public EmployeeDTO updateEmployee(Employee employee) {
+        Employee existing = employeeRepository.findById(employee.getId())
+                .orElseThrow(() -> new RuntimeException("Employee does not exist"));
 
-        employeeRepository.delete(employee);
+        if(employee.getPassword() != null) existing.setPassword(passwordEncoder.encode(employee.getPassword()));
 
-        return employee;
+        employeeRepository.save(existing);
+
+        return employeeResponse(existing);
+    }
+
+    @Override
+    @Transactional
+    public EmployeeDTO deleteEmployee(int id) {
+        Employee employee = employeeRepository.findById(id).orElseThrow();
+        Project project = null;
+        if(employee.getProjectId() != null) {
+            project = projectRepository.findById(employee.getProjectId()).orElseThrow();
+            employee.setProject(null);
+            if(employee.getRole() == Role.ROLE_MANAGER) {
+                project.setManager(null);
+            }
+            projectRepository.save(project);
+        }
+
+        employeeRepository.deleteById(id);
+
+        return employeeResponse(employee);
     }
 
 }

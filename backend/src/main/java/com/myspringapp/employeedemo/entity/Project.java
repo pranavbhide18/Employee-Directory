@@ -2,12 +2,20 @@ package com.myspringapp.employeedemo.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "project")
 public class Project {
 
@@ -18,17 +26,17 @@ public class Project {
     private Integer id;
 
     @Column(name = "project_name")
-    private String projectName;
+    private String name;
 
     @ManyToOne
     @JoinColumn(name = "project_manager_id")
-    private Employee projectManager;
+    private Employee manager;
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "project_type")
-    private String projectType;
+    private String type;
 
     @Column(name = "created_At")
     private Date createdAt;
@@ -38,108 +46,33 @@ public class Project {
 
     @OneToMany(mappedBy = "project")
     @JsonManagedReference
-    private List<Employee> projectTeam;
+    private List<Employee> team;
 
 
     @OneToMany(mappedBy = "project")
     @JsonManagedReference
     private List<Task> tasks;
 
-    public Project () {}
-
-    public Project(String projectName, Employee projectManager, List<Employee> projectTeam, List<Task> tasks) {
-        this.projectName = projectName;
-        this.projectManager = projectManager;
-        this.projectTeam = projectTeam != null ? projectTeam : new ArrayList<>();;
+    public Project(String name, Employee manager, List<Employee> team, List<Task> tasks) {
+        this.name = name;
+        this.manager = manager;
+        this.team = team != null ? team : new ArrayList<>();
         this.tasks = tasks != null ? tasks : new ArrayList<>();
         this.completed = false;
         this.createdAt = new Date(System.currentTimeMillis());
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getProjectName() {
-        return projectName;
-    }
-
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
-
-    public Employee getProjectManager() {
-        return projectManager;
-    }
-
-    public void setProjectManager(Employee projectManager) {
-        this.projectManager = projectManager;
-    }
-
-    public List<Employee> getProjectTeam() {
-        return projectTeam;
-    }
-
-    public void setProjectTeam(List<Employee> projectTeam) {
-        this.projectTeam = projectTeam;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getProjectType() {
-        return projectType;
-    }
-
-    public void setProjectType(String projectType) {
-        this.projectType = projectType;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public boolean isCompleted() {
-        return completed;
-    }
-
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
-    }
-
-    public List<Task> getTasks() {
-        return tasks;
-    }
-
-    public void setTasks(List<Task> tasks) {
-        this.tasks = tasks;
-    }
-
-
     // add convenience method to add the project manager
     public void addProjectManager(Employee employee) {
-        setProjectManager(employee);
+        setManager(employee);
     }
 
     // add convenience method to add an employee to the team
     public void addEmployeesToProject(List<Employee> employees) {
-        if (projectTeam == null) {
-            projectTeam = new ArrayList<>();
+        if (team == null) {
+            team = new ArrayList<>();
         }
-        projectTeam.addAll(employees);
+        team.addAll(employees);
         for (Employee employee : employees) {
             employee.setProject(this);
         }
@@ -152,7 +85,6 @@ public class Project {
         }
 
         tasks.add(newTask);
-        newTask.setCreatedAt(new Date(System.currentTimeMillis()));
         newTask.setProject(this);
     }
 

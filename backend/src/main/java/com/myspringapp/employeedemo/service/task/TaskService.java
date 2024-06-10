@@ -1,19 +1,23 @@
 package com.myspringapp.employeedemo.service.task;
 
 import com.myspringapp.employeedemo.entity.Task;
+import com.myspringapp.employeedemo.dto.TaskRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 @Service
 public interface TaskService {
 
-    Task findById(Integer id);
+    Task findTaskById(Integer id);
 
-    List<Task> findAll();
+    public List<Task> findAllTasks();
 
-    Task save(Task task);
+    public Task createTask(Integer projectId, TaskRequest task);
 
-    List<Task> saveAll(List<Task> tasks);
+    public List<Task> createMultipleTask(Integer projectId, List<Task> tasks);
 
-    Task delete(Integer id);
+    public Task deleteTask(Integer id);
+
+    public Task completeTask(Integer id);
 }

@@ -20,8 +20,7 @@ function Project() {
 
     const isAdminOrProjectManager =
         currentEmployee.role == "ROLE_ADMIN" ||
-        (project.projectManager &&
-            project.projectManager.id == currentEmployee.id);
+        (project.manager && project.manager.id == currentEmployee.id);
 
     useEffect(() => {
         const fetchProject = async () => {
@@ -266,11 +265,11 @@ function Project() {
                 </div>
                 <div className="border-l-2 border-gray-400"></div>
                 <div className="min-w-[600px] bg-white p-4 rounded-md shadow-lg">
-                    <p>{project.projectName}</p>
+                    <p>{project.name}</p>
                 </div>
                 <div className="border-l-2 border-gray-400"></div>
                 <div className="min-w-64 bg-white p-4 rounded-md shadow-lg">
-                    <p>{project.projectType}</p>
+                    <p>{project.type}</p>
                 </div>
                 <div className="border-l-2 border-gray-400"></div>
                 <div className="min-w-44 bg-white p-4 rounded-md shadow-lg">
@@ -350,8 +349,8 @@ function Project() {
                         <div className="min-h-72 max-h-72 bg-white p-4 rounded-md shadow-lg transform transition-transform duration-300 hover:scale-105 w-full overflow-y-scroll">
                             <div className="my-3">
                                 <h2>Project Team:</h2>
-                                {project.projectTeam &&
-                                    project.projectTeam.map((emp) => (
+                                {project.team &&
+                                    project.team.map((emp) => (
                                         <h3
                                             key={emp.id}
                                             className={
@@ -377,7 +376,7 @@ function Project() {
                                         className="block mb-2 text-sm font-medium text-gray-900"
                                     >
                                         <h2>
-                                            {project.projectTeam
+                                            {project.team
                                                 ? "Add More Team Members"
                                                 : "Add Team Members"}
                                         </h2>
@@ -429,11 +428,11 @@ function Project() {
                 {/* Third section */}
                 <div className="flex flex-col space-y-4 w-full">
                     <div className=" bg-white p-4 rounded-md shadow-lg transform transition-transform duration-300 hover:scale-105 ">
-                        {project.projectManager ? (
+                        {project.manager ? (
                             <p>
                                 {" "}
-                                {project.projectManager.firstName}{" "}
-                                {project.projectManager.lastName}
+                                {project.manager.firstName}{" "}
+                                {project.manager.lastName}
                             </p>
                         ) : (
                             "Manager not Assigned"
@@ -452,7 +451,7 @@ function Project() {
                                             className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                                         >
                                             <h2>
-                                                {project.projectManager
+                                                {project.manager
                                                     ? "Assign New Manager"
                                                     : "Assign Project Manager"}
                                             </h2>

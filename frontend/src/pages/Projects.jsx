@@ -96,12 +96,12 @@ function Projects() {
                                             to={`/project/${project.id}`}
                                             className="text-blue-500 hover:underline"
                                         >
-                                            {project.projectName}
+                                            {project.name}
                                         </Link>
                                     </td>
                                     <td className="px-6 py-4">
-                                        {project.projectManager !== null
-                                            ? project.projectManager.username
+                                        {project.manager !== null
+                                            ? project.manager.username
                                             : "Not Assigned"}
                                     </td>
                                     {isAdmin && (

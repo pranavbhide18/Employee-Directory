@@ -1,10 +1,12 @@
 package com.myspringapp.employeedemo.service.authentication;
 
 import com.myspringapp.employeedemo.dao.EmployeeRepository;
-import com.myspringapp.employeedemo.entity.AuthenticationResponse;
+import com.myspringapp.employeedemo.dto.AuthenticationResponse;
 import com.myspringapp.employeedemo.entity.Employee;
 import com.myspringapp.employeedemo.entity.Role;
-import com.myspringapp.employeedemo.entity.UserDTO;
+import com.myspringapp.employeedemo.dto.UserDTO;
+import com.myspringapp.employeedemo.dto.LoginRequest;
+import com.myspringapp.employeedemo.dto.RegisterRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,16 +27,17 @@ public class AuthenticationService {
     }
 
 
-    public UserDTO register(Employee request) {
-        Employee employee = new Employee();
-        employee.setFirstName(request.getFirstName());
-        employee.setLastName(request.getLastName());
-        employee.setUsername(request.getUsername());
-        employee.setPassword(passwordEncoder.encode(request.getPassword()));
+    public UserDTO register(RegisterRequest request) {
+        Employee employee = Employee.builder()
+                .firstName(request.firstName())
+                .lastName(request.lastName())
+                .username(request.username())
+                .email(request.email())
+                .password(passwordEncoder.encode(request.password()))
+                .role(Role.ROLE_ADMIN)
+                .build();
 
-        employee.setRole(Role.ROLE_EMPLOYEE);
-
-        employee = employeeRepository.save(employee);
+        employeeRepository.save(employee);
 
         String token = jwtService.generateToken(employee);
 
@@ -43,10 +46,10 @@ public class AuthenticationService {
         return authRes.getUserDTO();
     }
 
-    public UserDTO authenticate(Employee request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+    public UserDTO authenticate(LoginRequest request) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
 
-        Employee employee = employeeRepository.findByUsername(request.getUsername()).orElseThrow();
+        Employee employee = employeeRepository.findByUsername(request.username()).orElseThrow();
         String token = jwtService.generateToken(employee);
 
         AuthenticationResponse authRes = new AuthenticationResponse(token, employee);
